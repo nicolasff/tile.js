@@ -49,9 +49,13 @@
 	r3.appendChild(r4);
 	surface.add(r0);
 
-	var map = new Rectangle(100,100, 200, 200, {bgColor: "#fff4f4"});
-	var c0 = new Cell(0, 0, 40, 20, {
-
+	var map = new Rectangle(100,100, 200, 200, {
+		bgColor: "#fff4f4",
+		onclick: function(x,y) {
+			console.log("mouse clicked on map at(",x,",",y,")");
+		}
+		});
+	var c0 = new Cell(20, 20, 40, 20, {
 		bgColor: '#aaffaa',
 		lineWidth: 0.7,
 		strokeStyle: '#448844',
@@ -69,6 +73,10 @@
 			this.strokeStyle = "#448844";
 			this.invalidate();
 		},
+
+		onclick: function(x,y) {
+			console.log("mouse clicked on cell at(",x,",",y,")");
+		}
 	});
 	map.appendChild(c0);
 

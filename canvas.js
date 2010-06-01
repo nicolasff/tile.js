@@ -6,22 +6,10 @@ var CanvasObject = Class.extend({
 		this.objects = [];
 
 		var self = this;
-//		this.canvas.addEventListener("click", function(e) {self.onclick(e);}, this);
+		this.canvas.addEventListener("click", function(e) {self.onclick(e);}, this);
 		this.canvas.addEventListener("mousemove", function(e) {self.onmousemove(e);}, this);
 	},
-/*
-	onclick: function(e) {
-		// get coords in the canvas
-		var x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - this.canvas.offsetLeft;
-		var y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop - this.canvas.offsetTop;
 
-		this.objects.forEach(function(o) {
-			if(o.contains(x,y)) {
-				o.onclick(x,y);
-			}
-		});
-	},
-*/
 	onmousemove: function(e) {
 		// get coords in the canvas
 		var x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - this.canvas.offsetLeft;
@@ -30,7 +18,18 @@ var CanvasObject = Class.extend({
 		this.objects.forEach(function(o) {
 			o.mousemove(x,y);
 		});
+	},
 
+	onclick: function(e) {
+		// get coords in the canvas
+		var x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - this.canvas.offsetLeft;
+		var y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop - this.canvas.offsetTop;
+
+		this.objects.forEach(function(o) {
+			if(x > o.x && y > o.y) {
+				o.click(x,y);
+			}
+		});
 	},
 
 	add: function(obj) {
@@ -74,8 +73,7 @@ var CanvasSprite = Class.extend({
 		this.draw(this.ctx, this.deltaX, this.deltaY);
 		this.ctx.restore();
 	},
-	
-	savePosition: function(ctx, deltaX, deltaY) {
+	savePosition: function(ctx, deltaX, deltaY) { // TODO: find a better way to do this?
 		this.ctx = ctx;
 		this.deltaX = deltaX;
 		this.deltaY = deltaY;
@@ -103,6 +101,20 @@ var CanvasSprite = Class.extend({
 		} else if(this.containsMouse) {
 			this.containsMouse = false;
 			this.mouseLeave();
+		}
+	},
+
+	click: function(x,y) {
+
+		// check mousemove in all sub-children.
+		var deltaX = this.x, deltaY = this.y;
+		this.children.forEach(function(e) {
+			e.click(x - deltaX, y - deltaY);
+		});
+
+		// and then check myself.
+		if(this.contains(x,y)) {
+			this.onclick(x - deltaX,y - deltaY);
 		}
 	},
 
