@@ -35,19 +35,23 @@ var CanvasObject = Class.extend({
 
 	add: function(obj) {
 		var co = this;
-		obj.parent = function() { return co; };
+		obj.parent = this;
 		this.objects.push(obj);
 	},
 
 	draw: function() { 
-		this.objects.forEach(this.redraw);
+		var ctx = this.ctx;
+		this.objects.forEach(function(o) {
+			ctx.save();
+			o.draw(ctx, 0, 0);
+			ctx.restore();
+		});
 	},
 
-	redraw: function(o) {
-		var ctx = this.ctx;
-		ctx.save();
-		o.draw(ctx, 0, 0);
-		ctx.restore();
+	redraw: function() {
+		this.ctx.save();
+		this.draw(this.ctx, this.deltaX, this.deltaY);
+		this.ctx.restore();
 	}
 });
 
@@ -60,9 +64,23 @@ var CanvasSprite = Class.extend({
 		this.children = [];
 	},
 	invalidate: function() {
-		this.parent().redraw(this);
+		this.redraw();
 	},
-	draw: function(ctx) {},
+	draw: function(ctx, deltaX, deltaY) {
+		this.savePosition(ctx, deltaX, deltaY);
+	},
+	redraw: function() {
+		this.ctx.save();
+		this.draw(this.ctx, this.deltaX, this.deltaY);
+		this.ctx.restore();
+	},
+	
+	savePosition: function(ctx, deltaX, deltaY) {
+		this.ctx = ctx;
+		this.deltaX = deltaX;
+		this.deltaY = deltaY;
+	},
+
 	onclick: function(x,y) {},
 	mouseEnter: function() {},
 	mouseLeave: function() {},
@@ -128,6 +146,7 @@ var Rectangle = CanvasSprite.extend({
 	},
 
 	draw: function(ctx, deltaX, deltaY) {
+		this.savePosition(ctx, deltaX, deltaY);
 
 		// draw my points
 		ctx.fillStyle = this.bgColor;
@@ -168,6 +187,7 @@ var Cell = CanvasSprite.extend({
 	},
 
 	draw: function(ctx, deltaX, deltaY) {
+		this.savePosition(ctx, deltaX, deltaY);
 
 		ctx.strokeStyle = this.strokeStyle;
 		ctx.lineWidth = this.lineWidth;
@@ -183,10 +203,10 @@ var Cell = CanvasSprite.extend({
 		ctx.fill();
 		ctx.stroke();
 	},
-	/*
+
 	contains: function(x,y) {
-		
-		var ctx = this.parent().ctx;
+
+		var ctx = this.ctx;
 		ctx.beginPath();
 		ctx.moveTo(this._points[0].x, this._points[0].y);
 		for(var i = 0; i <= 4; i++) {
@@ -195,7 +215,7 @@ var Cell = CanvasSprite.extend({
 
 		var ret = ctx.isPointInPath(x,y);
 		return ret;
-	}*/
+	}
 });
 
 /*
