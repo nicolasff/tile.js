@@ -6,10 +6,10 @@ var CanvasObject = Class.extend({
 		this.objects = [];
 
 		var self = this;
-		this.canvas.addEventListener("click", function(e) {self.onclick(e);}, this);
-		this.canvas.addEventListener("mousemove", function(e) {self.onmousemove(e);}, this);
+//		this.canvas.addEventListener("click", function(e) {self.onclick(e);}, this);
+//		this.canvas.addEventListener("mousemove", function(e) {self.onmousemove(e);}, this);
 	},
-
+/*
 	onclick: function(e) {
 		// get coords in the canvas
 		var x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - this.canvas.offsetLeft;
@@ -21,7 +21,8 @@ var CanvasObject = Class.extend({
 			}
 		});
 	},
-
+*/
+/*
 	onmousemove: function(e) {
 		// get coords in the canvas
 		var x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - this.canvas.offsetLeft;
@@ -32,7 +33,7 @@ var CanvasObject = Class.extend({
 		});
 
 	},
-
+*/
 	add: function(obj) {
 		var co = this;
 		obj.parent = function() { return co; };
@@ -46,10 +47,9 @@ var CanvasObject = Class.extend({
 	redraw: function(o) {
 		var ctx = this.ctx;
 		ctx.save();
-		o.draw(ctx);
+		o.draw(ctx, 0, 0);
 		ctx.restore();
 	}
-	
 });
 
 var CanvasSprite = Class.extend({
@@ -58,6 +58,7 @@ var CanvasSprite = Class.extend({
 		for(k in options) {
 			this[k] = options[k];
 		}
+		this.children = [];
 	},
 	invalidate: function() {
 		this.parent().redraw(this);
@@ -69,6 +70,9 @@ var CanvasSprite = Class.extend({
 	contains: function(x,y) {return false;},
 
 	mousemove: function(x,y) {
+	//	this.children.forEach(function(e) {
+	//		e.mousemove(x,y);
+	//	});
 		if(this.contains(x,y)) {
 			if(this.containsMouse == false) {
 				this.containsMouse = true;
@@ -78,6 +82,11 @@ var CanvasSprite = Class.extend({
 			this.containsMouse = false;
 			this.mouseLeave();
 		}
+	},
+
+	appendChild: function(e) {
+		e.parent = this;
+		this.children.push(e);
 	},
 });
 
@@ -114,19 +123,26 @@ var Rectangle = CanvasSprite.extend({
 		return (x > this.x && x <= this.x + this.w && y > this.y && y <= this.y + this.h);
 	},
 
-	draw: function(ctx) {
+	draw: function(ctx, deltaX, deltaY) {
+		console.log(this, deltaX, deltaY);
 		ctx.fillStyle = this.bgColor;
 		ctx.beginPath();
 		var p0 = this._points[0];
-		ctx.moveTo(p0.x, p0.y);
+		ctx.moveTo(deltaX + p0.x, deltaY + p0.y);
 		this._points.forEach(function(p) {
-			ctx.lineTo(p.x, p.y);
+			ctx.lineTo(deltaX + p.x, deltaY + p.y);
 		});
-		ctx.lineTo(p0.x, p0.y);
+		ctx.lineTo(deltaX + p0.x, deltaY + p0.y);
 		ctx.fill();
+
+		var self = this;
+		this.children.forEach(function(e) {
+			e.draw(ctx, self.x + deltaX, self.y + deltaY);
+		});
 	}
 });
 
+/*
 var Cell = CanvasSprite.extend({
 	
 	init: function(x, y, w, h, options) {
@@ -235,4 +251,4 @@ var Map = CanvasSprite.extend({
 		});
 	},
 });
-
+*/

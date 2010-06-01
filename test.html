@@ -21,7 +21,20 @@
 	var ctx = c.getContext("2d");
 
 	var surface = new CanvasObject("c");
+	
+	var r0 = new Rectangle(0,0, 50, 50, {bgColor: '#000000'});
+	var r1 = new Rectangle(10,10, 40, 40, {bgColor: '#ff0000'});
+	var r2 = new Rectangle(10,10, 30, 30, {bgColor: '#00ff00'});
+	var r3 = new Rectangle(10,10, 20, 20, {bgColor: '#0000ff'});
+	var r4 = new Rectangle(10,10, 10, 10, {bgColor: '#ffff00'});
 
+	r0.appendChild(r1);
+	r1.appendChild(r2);
+	r2.appendChild(r3);
+	r3.appendChild(r4);
+	surface.add(r0);
+
+/*
 	surface.add(new Rectangle(10, 10, 5, 130, {
 
 		bgColor: "#cc0000",
@@ -83,7 +96,7 @@
 		cellW: 40,
 		cellH: 20,
 	}));
-
+*/
 	surface.draw();
 
 </script>
