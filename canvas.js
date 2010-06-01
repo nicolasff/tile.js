@@ -7,7 +7,7 @@ var CanvasObject = Class.extend({
 
 		var self = this;
 //		this.canvas.addEventListener("click", function(e) {self.onclick(e);}, this);
-//		this.canvas.addEventListener("mousemove", function(e) {self.onmousemove(e);}, this);
+		this.canvas.addEventListener("mousemove", function(e) {self.onmousemove(e);}, this);
 	},
 /*
 	onclick: function(e) {
@@ -22,7 +22,6 @@ var CanvasObject = Class.extend({
 		});
 	},
 */
-/*
 	onmousemove: function(e) {
 		// get coords in the canvas
 		var x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - this.canvas.offsetLeft;
@@ -33,7 +32,7 @@ var CanvasObject = Class.extend({
 		});
 
 	},
-*/
+
 	add: function(obj) {
 		var co = this;
 		obj.parent = function() { return co; };
@@ -70,9 +69,14 @@ var CanvasSprite = Class.extend({
 	contains: function(x,y) {return false;},
 
 	mousemove: function(x,y) {
-	//	this.children.forEach(function(e) {
-	//		e.mousemove(x,y);
-	//	});
+
+		// check mousemove in all sub-children.
+		var deltaX = this.x, deltaY = this.y;
+		this.children.forEach(function(e) {
+			e.mousemove(x - deltaX, y - deltaY);
+		});
+
+		// and then check myself.
 		if(this.contains(x,y)) {
 			if(this.containsMouse == false) {
 				this.containsMouse = true;
@@ -124,7 +128,8 @@ var Rectangle = CanvasSprite.extend({
 	},
 
 	draw: function(ctx, deltaX, deltaY) {
-		console.log(this, deltaX, deltaY);
+
+		// draw my points
 		ctx.fillStyle = this.bgColor;
 		ctx.beginPath();
 		var p0 = this._points[0];
@@ -135,6 +140,7 @@ var Rectangle = CanvasSprite.extend({
 		ctx.lineTo(deltaX + p0.x, deltaY + p0.y);
 		ctx.fill();
 
+		// draw my sub-nodes, possibly over myself.
 		var self = this;
 		this.children.forEach(function(e) {
 			e.draw(ctx, self.x + deltaX, self.y + deltaY);
@@ -142,13 +148,12 @@ var Rectangle = CanvasSprite.extend({
 	}
 });
 
-/*
 var Cell = CanvasSprite.extend({
 	
 	init: function(x, y, w, h, options) {
-		this.lineStyle = "#000000";
+		this.strokeStyle = "#000000";
 		this.lineWidth = 1;
-		this.fillStyle = "#eeeeee";
+		this.bgColor = "#eeeeee";
 		this._super(options);
 		this.x = x;
 		this.y = y;
@@ -162,23 +167,23 @@ var Cell = CanvasSprite.extend({
 			{x:this.x,		y: this.y + this.h/2}];
 	},
 
-	draw: function(ctx) {
+	draw: function(ctx, deltaX, deltaY) {
 
-		ctx.lineStyle = this.lineStyle;
+		ctx.strokeStyle = this.strokeStyle;
 		ctx.lineWidth = this.lineWidth;
-		ctx.fillStyle = this.fillStyle;
+		ctx.fillStyle = this.bgColor;
 
 		ctx.beginPath();
 		var p0 = this._points[0];
-		ctx.moveTo(p0.x, p0.y);
+		ctx.moveTo(deltaX + p0.x, deltaY + p0.y);
 		this._points.forEach(function(p) {
-			ctx.lineTo(p.x, p.y);
+			ctx.lineTo(deltaX + p.x, deltaY + p.y);
 		});
-		ctx.lineTo(p0.x, p0.y);
+		ctx.lineTo(deltaX + p0.x, deltaY + p0.y);
 		ctx.fill();
 		ctx.stroke();
 	},
-
+	/*
 	contains: function(x,y) {
 		
 		var ctx = this.parent().ctx;
@@ -190,10 +195,10 @@ var Cell = CanvasSprite.extend({
 
 		var ret = ctx.isPointInPath(x,y);
 		return ret;
-	}
+	}*/
 });
 
-
+/*
 var Map = CanvasSprite.extend({
 	
 	cellW: 100,

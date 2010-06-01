@@ -22,17 +22,38 @@
 
 	var surface = new CanvasObject("c");
 	
-	var r0 = new Rectangle(0,0, 50, 50, {bgColor: '#000000'});
-	var r1 = new Rectangle(10,10, 40, 40, {bgColor: '#ff0000'});
-	var r2 = new Rectangle(10,10, 30, 30, {bgColor: '#00ff00'});
-	var r3 = new Rectangle(10,10, 20, 20, {bgColor: '#0000ff'});
-	var r4 = new Rectangle(10,10, 10, 10, {bgColor: '#ffff00'});
+	var r0 = new Rectangle(30,20, 50, 50, {bgColor: '#aaaaaa', 
+		mouseEnter: function() {console.log("mouse entering the black rectangle");},
+		mouseLeave: function() {console.log("mouse leaving the black rectangle");},
+		});
+	var r1 = new Rectangle(10,10, 40, 40, {bgColor: '#ffaaaa',
+		mouseEnter: function() {console.log("mouse entering the red rectangle");},
+		mouseLeave: function() {console.log("mouse leaving the red rectangle");},
+		});
+	var r2 = new Rectangle(10,10, 30, 30, {bgColor: '#aaffaa',
+		mouseEnter: function() {console.log("mouse entering the green rectangle");},
+		mouseLeave: function() {console.log("mouse leaving the green rectangle");},
+		});
+	var r3 = new Rectangle(10,10, 20, 20, {bgColor: '#aaaaff',
+		mouseEnter: function() {console.log("mouse entering the blue rectangle");},
+		mouseLeave: function() {console.log("mouse leaving the blue rectangle");},
+		});
+	var r4 = new Rectangle(10,10, 10, 10, {bgColor: '#ffffaa',
+		mouseEnter: function() {console.log("mouse entering the yellow rectangle");},
+		mouseLeave: function() {console.log("mouse leaving the yellow rectangle");},
+		});
 
 	r0.appendChild(r1);
 	r1.appendChild(r2);
 	r2.appendChild(r3);
 	r3.appendChild(r4);
 	surface.add(r0);
+
+	var map = new Rectangle(100,100, 200, 200, {bgColor: "#fff4f4"});
+	var c0 = new Cell(0, 0, 40, 20, {bgColor: '#aaffaa', lineWidth: 0.7, strokeStyle: '#448844'});
+	map.appendChild(c0);
+
+	surface.add(map);
 
 /*
 	surface.add(new Rectangle(10, 10, 5, 130, {
