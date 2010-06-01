@@ -53,6 +53,9 @@ var CanvasObject = Class.extend({
 });
 
 var CanvasSprite = Class.extend({
+	
+	zIndex: 0,
+
 	init: function(options) {
 		this.containsMouse = false;
 		for(k in options) {
@@ -256,6 +259,40 @@ var Map = CanvasSprite.extend({
 				this.appendChild(c);
 			}
 		}
+	},
+});
+
+var ImageSprite = CanvasSprite.extend({
+	
+	init: function(x,y,src,options) {
+		this.cellOptions = {},
+		this._super(options);
+		this.x = x;
+		this.y = y;
+		this.w = 1;
+		this.h = 1;
+		this.loaded = false;
+
+		this.image = new Image();
+		var sprite = this;
+		this.image.onload = function() {
+			sprite.loaded = true;
+			sprite.w = this.width;
+			sprite.h = this.height;
+			sprite.invalidate();
+		};
+		this.image.src = src;
+	},
+
+	draw: function(ctx, dx, dy) {
+		this.savePosition(ctx, dx, dy);
+		if(this.loaded) {
+			ctx.drawImage(this.image, this.x + dx, this.y + dy);
+		}
+	},
+
+	contains: function(x,y) {
+		return (x > this.x && x <= this.x + this.w && y > this.y && y <= this.y + this.h);
 	},
 });
 

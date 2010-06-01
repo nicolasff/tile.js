@@ -49,7 +49,7 @@
 	r3.appendChild(r4);
 	surface.add(r0);
 
-	var map = new Rectangle(100,100, 200, 200, {
+	var pinkRect = new Rectangle(100,100, 200, 200, {
 		bgColor: "#fff4f4",
 		onclick: function(x,y) {
 			console.log("mouse clicked on pink square at(",x,",",y,")");
@@ -78,30 +78,30 @@
 			console.log("mouse clicked on cell at(",x,",",y,")");
 		}
 	});
-	map.appendChild(c0);
+	pinkRect.appendChild(c0);
 
-	surface.add(map);
+	surface.add(pinkRect);
 
 
 	var cellOptions = {
 
-		bgColor: "#00cc00",
+		bgColor: "#99cc99",
 		selected: false,
 
 		mouseEnter: function() {
 			if(this.selected) {
-				this.bgColor = "#ff0000";
+				this.bgColor = "#ffaaaa";
 			} else {
-				this.bgColor = "#cc0000";
+				this.bgColor = "#cc9999";
 			}
 			this.invalidate();
 		},
 
 		mouseLeave: function() {
 			if(this.selected) {
-				this.bgColor = "#00ff00";
+				this.bgColor = "#aaffaa";
 			} else {
-				this.bgColor = "#00cc00";
+				this.bgColor = "#99cc99";
 			}
 			this.invalidate();
 		},
@@ -113,11 +113,21 @@
 		}
 	};
 
-	surface.add(new Map(200, 200, 6, 6, {
+	var m = new Map(250, 200, 5, 5, {
 		cellOptions: cellOptions,
-		cellW: 40,
-		cellH: 20,
-	}));
+		cellW: 100,
+		cellH: 50,
+	});
+	surface.add(m);
+
+	var i = new ImageSprite(-29, -20, "building.png", {
+
+		zIndex: 10,
+
+		onclick: function(x,y) {
+			console.log("building click !");
+		} });
+	m.appendChild(i);
 
 	surface.draw();
 
