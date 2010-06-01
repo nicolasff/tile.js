@@ -26,9 +26,7 @@ var CanvasObject = Class.extend({
 		var y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop - this.canvas.offsetTop;
 
 		this.objects.forEach(function(o) {
-			if(x > o.x && y > o.y) {
-				o.click(x,y);
-			}
+			o.click(x,y);
 		});
 	},
 
@@ -67,6 +65,11 @@ var CanvasSprite = Class.extend({
 	},
 	draw: function(ctx, deltaX, deltaY) {
 		this.savePosition(ctx, deltaX, deltaY);
+		deltaX += this.x;
+		deltaY += this.y;
+		this.children.forEach(function(o) {
+			o.draw(ctx, deltaX, deltaY);
+		});
 	},
 	redraw: function() {
 		this.ctx.save();
@@ -230,7 +233,6 @@ var Cell = CanvasSprite.extend({
 	}
 });
 
-/*
 var Map = CanvasSprite.extend({
 	
 	cellW: 100,
@@ -244,48 +246,16 @@ var Map = CanvasSprite.extend({
 		this.w = w;
 		this.h = h;
 
-		this.cells = [];
 		for(var i = 0; i < w; i++) {
 			for(var j = 0; j < h; j++) {
-				var cellX = this.x + i * (this.cellW / 2) - j * (this.cellW/2) - (this.cellW / 2);
-				var cellY = this.y + j * (this.cellH / 2) + i * (this.cellH/2) - (this.cellH / 2);
+				var cellX = i * (this.cellW / 2) - j * (this.cellW/2) - (this.cellW / 2);
+				var cellY = j * (this.cellH / 2) + i * (this.cellH/2) - (this.cellH / 2);
 
 				var c = new Cell(cellX, cellY, this.cellW, this.cellH, this.cellOptions);
-				this.cells.push(c);
+				c.coords = {x: i, y:j};
+				this.appendChild(c);
 			}
 		}
-	},
-
-	draw: function(ctx) {
-		var map = this;
-		this.cells.forEach(function(c) {
-			c.parent = map.parent;
-			c.draw(ctx);
-		});
-	},
-
-	mousemove: function(x,y) {
-		this.cells.forEach(function(c) {
-			c.mousemove(x,y);
-		});
-	},
-
-	contains: function(x,y) {
-		for(var i = 0; i < this.cells.length; i++) {
-			if(this.cells[i].contains(x,y)) {
-				return true;
-			}
-		}
-		return false;
-	},
-
-	onclick: function(x,y) {
-
-		this.cells.forEach(function(c) {
-			if(c.contains(x,y)) {
-				c.onclick(x,y);
-			}
-		});
 	},
 });
-*/
+
