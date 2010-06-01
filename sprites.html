@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>?</title>
+		<style type="text/css">
+
+#c {
+	width: 200px;
+	height: 200px;
+	border: 1px solid black;
+}
+canvas.cell {
+	width: 20px;
+	height: 20px;
+	border: 1px solid red;
+}
+		</style>
+	</head>
+
+	<body>
+		<canvas id="c" width="20" height="20">
+		</canvas>
+		<canvas id="cell-0-0" class="cell"></canvas>
+	<br/>
+	x
+<script type="text/javascript">
+			
+var c = document.getElementById("cell-0-0");
+var ctx = c.getContext("2d");
+
+c.width = 20;
+c.height = 20;
+
+ctx.fillStyle = "#80901e";
+/*
+ctx.beginPath();
+ctx.moveTo(5,5);
+ctx.lineTo(15,5);
+ctx.lineTo(15,15);
+ctx.lineTo(5,15);
+ctx.lineTo(5,5);
+ctx.fill();
+*/
+
+ctx.beginPath();
+ctx.arc(10, 10, 3, 0, 2 * Math.PI, true);
+ctx.fill();
+
+
+
+</script>
+</body>
+</html>

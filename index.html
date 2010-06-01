@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>?</title>
+		<!--[if IE]><script src="excanvas.js"></script><![endif]-->
+		<style type="text/css">
+
+#c {
+	width: 760px;
+	height: 667px;
+	border: 1px solid black;
+}
+		</style>
+	</head>
+
+	<body>
+		<canvas id="c" width="760" height="667"></canvas>
+		<script type="text/javascript">
+
+function render() {
+				
+	var c = document.getElementById("c");
+
+	function Map(c,w,h) {
+		this.w = w;
+		this.h = h;
+		this.ctx = c.getContext("2d");
+
+		this.deltaX = 0;
+		this.deltaY = 0;
+
+		this.cellW = 100;
+		this.cellH = 50;
+
+		this.cells = {};
+
+		this.computeTranslate = function() {
+			this.translateX = this.deltaX + (this.cellW * this.w) / 2 + (c.width - this.cellW * this.w) / 2;
+			this.translateY = this.deltaY + (this.cellH * this.h) / 2; // - (c.height - cellH * this.h) / 2;
+		}
+
+		this.mousemove = function(e) {
+
+			var x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+			var y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+			x -= c.offsetLeft;
+			y -= c.offsetTop;
+
+			if(this.dragging) {
+				this.drag(x, y);
+			}
+
+			for(var i = 0; i < this.w; ++i) {
+				for(var j = 0; j < this.h; ++j) {
+					this.cells[i][j].detectMouse(x, y);
+				}
+			}
+		}
+
+		this.mousedown = function(e) {
+			var x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+			var y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+			x -= c.offsetLeft;
+			y -= c.offsetTop;
+
+			this.dragging = true;
+			this.dragX = x;
+			this.dragY = y;
+		}
+
+		this.mouseup = function(e) {
+			this.dragging = false;
+
+		}
+
+		this.drag = function(x, y) {
+			this.deltaX = (x - this.dragX);
+			this.deltaY = (y - this.dragY);
+
+			this.draw();
+		}
+
+		var m = this;
+		
+		if(c.addEventListener) {
+			c.attachEvent = function(e,f) {c.addEventListener(e,f,false);};
+		}
+
+		c.attachEvent("mousemove", function(e) { m.mousemove(e); });
+		c.attachEvent("mousedown", function(e) { m.mousedown(e); });
+		c.attachEvent("mouseup", function(e) { m.mouseup(e); });
+		//c.addEventListener("scroll", console.log, false);
+
+		// initialize cells
+		for(var x = 0; x < this.w; ++x) {
+			this.cells[x] = {};
+			for(var y = 0; y < this.h; ++y) {
+				this.cells[x][y] = new Cell(this, x, y);
+			}
+		}
+
+		// draw each cell
+		this.draw = function() {
+			
+			this.computeTranslate();
+			this.ctx.fillStyle = "#fff";
+			this.ctx.fillRect(0,0,this.ctx.canvas.width, this.ctx.canvas.height);
+
+			for(var x = 0; x < this.w; ++x) {
+				for(var y = 0; y < this.h; ++y) {
+					this.cells[x][y].draw(this.ctx);
+				}
+			}
+		}
+
+
+	}
+
+	function Cell(m,x,y) {
+		this.x = x;
+		this.y = y;
+		this.m = m;
+		this.ctx = this.m.ctx;
+		this.selected = false;
+
+		this.cellW = this.m.cellW;
+		this.cellH = this.m.cellH;
+
+
+		this.updatePosition = function() {
+			// position on the canvas, starting at 0,0
+			this.canvasX = this.m.translateX + this.x * (this.cellW / 2) - this.y * (this.cellW/2) - (this.cellW / 2);
+			this.canvasY = this.m.translateY + this.y * (this.cellH / 2) + this.x * (this.cellH/2) - (this.cellH / 2);
+
+			this.points = [
+				{x:this.canvasX + this.cellW/2,	y: this.canvasY},
+				{x:this.canvasX + this.cellW,	y: this.canvasY + this.cellH/2},
+				{x:this.canvasX + this.cellW/2,	y: this.canvasY + this.cellH},
+				{x:this.canvasX,		y: this.canvasY + this.cellH/2}];
+		}
+
+		this.draw = function() {
+
+			this.updatePosition();
+
+			this.ctx.strokeStyle = "#75831c";
+			if(this.selected) {
+				this.ctx.fillStyle = "#80901e";
+			} else {
+				this.ctx.fillStyle = "#a0b03e";
+			}
+			this.ctx.lineWidth = 1.5;
+
+			this.ctx.beginPath();
+			this.ctx.moveTo(this.points[0].x, this.points[0].y);
+			for(var i = 0; i <= 4; i++) {
+				this.ctx.lineTo(this.points[i % 4].x, this.points[i % 4].y);
+			}
+			this.ctx.fill();
+			this.ctx.stroke();
+		}
+
+		this.detectMouse = function(x,y) {
+			
+			this.ctx.beginPath();
+			this.ctx.moveTo(this.points[0].x, this.points[0].y);
+			for(var i = 0; i <= 4; i++) {
+				this.ctx.lineTo(this.points[i % 4].x, this.points[i % 4].y);
+			}
+			var ret = this.ctx.isPointInPath(x,y);
+
+			if(ret != this.selected) {
+				this.selected = ret;
+				this.draw();
+			}
+			return ret;
+		}
+	}
+
+	var m = new Map(c,8,8);
+	m.draw();
+}
+
+window.onload = render;
+
+		</script>
+	</body>
+</html>

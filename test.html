@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>?</title>
+		<!--[if IE]><script src="excanvas.js"></script><![endif]-->
+		<script src="oo.js"></script>
+		<script src="canvas.js"></script>
+		<style type="text/css">
+
+#c {
+	border: 1px solid black;
+}
+		</style>
+	</head>
+
+	<body>
+		<canvas id="c" width="500" height="500"></canvas>
+<script type="text/javascript">
+
+	var c = document.getElementById("c");
+	var ctx = c.getContext("2d");
+
+	var surface = new CanvasObject("c");
+
+	surface.add(new Rectangle(10, 10, 5, 130, {
+
+		bgColor: "#cc0000",
+		
+		onclick: function() { alert("CLICK 0"); },
+		
+		mouseEnter: function() {
+			this.bgColor = "#00cc00";
+			this.invalidate();
+		},
+
+		mouseLeave: function() {
+			this.bgColor = "#cc0000";
+			this.invalidate();
+		}}));
+
+	surface.add(new Rectangle(50, 50, 20, 20, {
+		onclick: function() { alert("CLICK 2"); }}));
+
+	surface.add(new Rectangle(5,5,3));
+
+	var cellOptions = {
+
+		fillStyle: "#00cc00",
+		selected: false,
+
+		mouseEnter: function() {
+			if(this.selected) {
+				this.fillStyle = "#ff0000";
+			} else {
+				this.fillStyle = "#cc0000";
+			}
+			this.invalidate();
+		},
+
+		mouseLeave: function() {
+			if(this.selected) {
+				this.fillStyle = "#00ff00";
+			} else {
+				this.fillStyle = "#00cc00";
+			}
+			this.invalidate();
+		},
+
+		onclick: function(x,y) {
+			this.selected = !this.selected;
+			this.mouseEnter();
+		}
+	};
+
+	surface.add(new Cell(120,20,40,20, cellOptions));
+	surface.add(new Cell(140,30,40,20, cellOptions));
+
+	surface.add(new Cell(100,30,40,20, cellOptions));
+	surface.add(new Cell(120,40,40,20, cellOptions));
+
+	surface.add(new Map(250, 100, 12, 12, {
+		cellOptions: cellOptions,
+		cellW: 40,
+		cellH: 20,
+	}));
+
+	surface.draw();
+
+</script>
+</body>
+</html>
