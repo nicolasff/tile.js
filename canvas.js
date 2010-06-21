@@ -220,6 +220,12 @@ var Cell = CanvasSprite.extend({
 		ctx.lineTo(deltaX + p0.x, deltaY + p0.y);
 		ctx.fill();
 		ctx.stroke();
+
+		this.children.forEach(function(o) {
+			ctx.save();
+			o.draw(ctx, deltaX + p0.x, deltaY + p0.y);
+			ctx.restore();
+		});
 	},
 
 	contains: function(x,y) {
@@ -248,18 +254,27 @@ var Map = CanvasSprite.extend({
 		this.y = y;
 		this.w = w;
 		this.h = h;
+		this.cells = {};
 
 		for(var i = 0; i < w; i++) {
+			this.cells[i] = {};
 			for(var j = 0; j < h; j++) {
+				this.cells[i][j] = c;
+
 				var cellX = i * (this.cellW / 2) - j * (this.cellW/2) - (this.cellW / 2);
 				var cellY = j * (this.cellH / 2) + i * (this.cellH/2) - (this.cellH / 2);
 
 				var c = new Cell(cellX, cellY, this.cellW, this.cellH, this.cellOptions);
 				c.coords = {x: i, y:j};
 				this.appendChild(c);
+				this.cells[i][j] = c;
 			}
 		}
 	},
+
+	get: function(x,y) {
+		return this.cells[x][y];
+	}
 });
 
 var ImageSprite = CanvasSprite.extend({
@@ -272,7 +287,9 @@ var ImageSprite = CanvasSprite.extend({
 		this.w = 1;
 		this.h = 1;
 		this.loaded = false;
+		this.imagedata = null;
 
+		this.src = src;
 		this.image = new Image();
 		var sprite = this;
 		this.image.onload = function() {
@@ -281,18 +298,27 @@ var ImageSprite = CanvasSprite.extend({
 			sprite.h = this.height;
 			sprite.invalidate();
 		};
-		this.image.src = src;
 	},
 
 	draw: function(ctx, dx, dy) {
 		this.savePosition(ctx, dx, dy);
 		if(this.loaded) {
+			if(this.imagedata == null) {
+				this.imagedata = ctx.getImageData(this.x + dx, this.y + dy, this.w, this.h);
+			}
 			ctx.drawImage(this.image, this.x + dx, this.y + dy);
+		} else {
+			this.image.src = this.src;
 		}
 	},
 
 	contains: function(x,y) {
-		return (x > this.x && x <= this.x + this.w && y > this.y && y <= this.y + this.h);
+		if(this.imagedata == null || x >= this.w || x < 0 || y >= this.h || y < 0) {
+		//	console.log("(outside). (x=",x,", y=",y,"). this.w=", this.w, ", this.h=", this.h, "data=", this.imagedata);
+			return false;
+		}
+
+		return true;
 	},
 });
 

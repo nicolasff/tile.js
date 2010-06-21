@@ -118,17 +118,18 @@
 		cellW: 100,
 		cellH: 50,
 	});
-	surface.add(m);
 
-	var i = new ImageSprite(-29, -20, "building.png", {
+	var i = new ImageSprite(-32, -40, "building.png", {
 
 		zIndex: 10,
 
 		onclick: function(x,y) {
 			console.log("building click !");
 		} });
-	m.appendChild(i);
 
+	m.get(4,4).appendChild(i);
+
+	surface.add(m);
 	surface.draw();
 
 </script>
